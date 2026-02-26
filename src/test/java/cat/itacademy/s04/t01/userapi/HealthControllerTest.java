@@ -19,11 +19,8 @@ public class HealthControllerTest {
 
     @Test
     void shouldReturnOkStatus() throws Exception {
-        // Simulem una petició GET a /health
         mockMvc.perform(get("/health"))
-                // Verifiquem que el codi de resposta és 200 OK
                 .andExpect(status().isOk())
-                // Comprovem que la resposta JSON conté "status": "OK"
                 .andExpect(jsonPath("$.status").value("Ok"));
 
 
