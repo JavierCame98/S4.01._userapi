@@ -13,7 +13,7 @@ public class UserController {
     private List<User> userList = new ArrayList<>();
 
 
-    @GetMapping
+    @GetMapping("/users")
     private List<User> getAllUsers(){
         return userList;
     }
