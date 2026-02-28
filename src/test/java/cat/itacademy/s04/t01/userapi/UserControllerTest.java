@@ -2,14 +2,17 @@ package cat.itacademy.s04.t01.userapi;
 
 
 import cat.itacademy.s04.t01.userapi.controllers.UserController;
-import org.junit.jupiter.api.MediaType;
+import cat.itacademy.s04.t01.userapi.dto.UserDTO;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -30,9 +33,15 @@ public class UserControllerTest {
     }
 
     @Test
-    void createUser_returnsUserWithId() {
-        // Simula POST /users amb JSON
-        // Espera que torni el mateix usuari amb UUID no nul
+    void createUser_returnsUserWithId() throws Exception {
+        UserDTO userDto = new UserDTO("Javier", "javier@mail.com");
+
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Javier"));
     }
 
     @Test
