@@ -5,12 +5,15 @@ import cat.itacademy.s04.t01.userapi.controllers.UserController;
 import cat.itacademy.s04.t01.userapi.dto.UserDTO;
 
 import cat.itacademy.s04.t01.userapi.model.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,6 +27,13 @@ public class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private UserController userController;
+
+    @BeforeEach
+    void setUp() {
+        userController.clearUsers();
+    }
 
     @Test
     void getUsers_returnsEmptyListInitially() throws Exception {
@@ -70,13 +80,34 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUserById_returnsNotFoundIfMissing() {
+    void getUserById_returnsNotFoundIfMissing() throws Exception {
+        String randomID = UUID.randomUUID().toString();
+
+        mockMvc.perform(get("/users" + randomID))
+                .andExpect(status().isNotFound());
         // Simula GET /users/{id} amb un id aleatori
         // Espera 404
     }
 
     @Test
-    void getUsers_withNameParam_returnsFilteredUsers() {
+    void getUsers_withNameParam_returnsFilteredUsers() throws Exception {
+
+        UserDTO user1 = new UserDTO("Jordi", "jordi@mail.com");
+        UserDTO user2 = new UserDTO("Javier", "javier@mail.com");
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user1)));
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user2)));
+
+        mockMvc.perform(get("/users").param("name", "jo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].name").value("Jordi"));
+
         // Afegeix dos usuaris amb POST
         // Fa GET /users?name=jo i comprova que només torni els que contenen "jo"
     }

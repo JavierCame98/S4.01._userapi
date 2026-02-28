@@ -19,7 +19,7 @@ public class UserController {
     public List<User> getAllUsers(@RequestParam (required = false) String name){
         if(name == null){return userList;}
         return userList.stream()
-                .filter(user -> user.name().equalsIgnoreCase(name))
+                .filter(user -> user.name().toLowerCase().contains(name.toLowerCase()))
                 .toList();
     }
 
@@ -37,5 +37,9 @@ public class UserController {
                 .filter(user -> user.id().equals(id))
                 .findFirst()
                 .orElseThrow( () -> new UserNotFoundException("User not found by id: " + id));
+    }
+
+    public void clearUsers() {
+        userList.clear();
     }
 }
