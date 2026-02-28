@@ -4,6 +4,7 @@ package cat.itacademy.s04.t01.userapi;
 import cat.itacademy.s04.t01.userapi.controllers.UserController;
 import cat.itacademy.s04.t01.userapi.dto.UserDTO;
 
+import cat.itacademy.s04.t01.userapi.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -45,7 +46,25 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUserById_returnsCorrectUser() {
+    void getUserById_returnsCorrectUser() throws  Exception{
+        UserDTO userDto = new UserDTO("Javier", "javier@mail.com");
+
+        String responseBody = mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        User createdUser = objectMapper.readValue(responseBody, User.class);
+        String userID = createdUser.id().toString();
+
+        mockMvc.perform(get("/users/" + userID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Javier"))
+                .andExpect(jsonPath("$.id").value(userID));
+
         // Primer afegeix un usuari amb POST
         // Després GET /users/{id} i comprova que torni aquest usuari
     }
