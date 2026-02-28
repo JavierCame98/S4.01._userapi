@@ -16,8 +16,11 @@ public class UserController {
 
 
     @GetMapping("/users")
-    public List<User> getAllUsers(){
-        return userList;
+    public List<User> getAllUsers(@RequestParam (required = false) String name){
+        if(name == null){return userList;}
+        return userList.stream()
+                .filter(user -> user.name().equalsIgnoreCase(name))
+                .toList();
     }
 
     @PostMapping("/users")
