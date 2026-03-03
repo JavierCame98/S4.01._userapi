@@ -2,12 +2,15 @@ package cat.itacademy.s04.t01.userapi.service;
 
 import cat.itacademy.s04.t01.userapi.dto.UserDTO;
 import cat.itacademy.s04.t01.userapi.exceptions.EmailAlreadyExistsException;
+import cat.itacademy.s04.t01.userapi.exceptions.UserNotFoundException;
 import cat.itacademy.s04.t01.userapi.model.User;
 import cat.itacademy.s04.t01.userapi.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
@@ -18,7 +21,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<User> getUsers(String name) {
-        return List.of();
+        if (name == null || name.isEmpty()){
+            return userRepository.findAll();
+        }
+        return userRepository.searchByName(name);
     }
 
     @Override
@@ -32,6 +38,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserById(UUID id) {
-        return null;
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("This id dosen't exists" + id.toString()));
     }
 }
