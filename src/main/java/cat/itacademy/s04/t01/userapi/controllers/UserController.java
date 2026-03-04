@@ -3,6 +3,7 @@ package cat.itacademy.s04.t01.userapi.controllers;
 import cat.itacademy.s04.t01.userapi.dto.UserDTO;
 import cat.itacademy.s04.t01.userapi.exceptions.UserNotFoundException;
 import cat.itacademy.s04.t01.userapi.model.User;
+import cat.itacademy.s04.t01.userapi.service.UserServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -12,7 +13,13 @@ import java.util.UUID;
 @RestController
 public class UserController {
 
+    private final UserServiceImpl service;
+
     private List<User> userList = new ArrayList<>();
+
+    public UserController(UserServiceImpl service) {
+        this.service = service;
+    }
 
 
     @GetMapping("/users")
